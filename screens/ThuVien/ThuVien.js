@@ -28,7 +28,7 @@ const ThuVien = ({navigation}) => {
                     numColumns={2} // Hiển thị 2 sách mỗi hàng
                     showsHorizontalScrollIndicator={false}
                     renderItem={({ item }) => (
-                        <Card style={styles.card}>
+                        <Card style={styles.card} onPress={() => navigation.navigate('ReadBook')}>
                             <Image
                                 source={{ uri: item.image }}
                                 style={styles.cardImageLibrary}

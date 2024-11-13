@@ -12,6 +12,8 @@ import ChuyenMuc from '../screens/LoaiSach/ChuyenMuc';
 import TimKiem from '../screens/TimKiem/TimKiem';
 import CaNhan from '../screens/CaNhan/CaNhan';
 import ThuVien from '../screens/ThuVien/ThuVien';
+import DocSach from '../screens/DocSach/DocSach';
+
 
 // Tạo Stack Navigator cho Đăng Nhập và Đăng Ký
 const Stack = createStackNavigator();
@@ -36,6 +38,9 @@ const CategoryStack = () => (
     <Stack.Screen name="CategoryBook">
       {props => <LoaiSach {...props} />}
     </Stack.Screen>
+    <Stack.Screen name="ReadBook">
+      {props => <DocSach {...props} />}
+    </Stack.Screen>
   </Stack.Navigator>
 );
 
@@ -46,6 +51,34 @@ const HomeStack = () => (
     </Stack.Screen>
     <Stack.Screen name="CategoryBook">
       {props => <LoaiSach {...props} />}
+    </Stack.Screen>
+    <Stack.Screen name="ReadBook">
+      {props => <DocSach {...props} />}
+    </Stack.Screen>
+  </Stack.Navigator>
+);
+
+const SearchStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="Search">
+      {props => <TimKiem {...props} />}
+    </Stack.Screen>
+    <Stack.Screen name="CategoryBook">
+      {props => <LoaiSach {...props} />}
+    </Stack.Screen>
+    <Stack.Screen name="ReadBook">
+      {props => <DocSach {...props} />}
+    </Stack.Screen>
+  </Stack.Navigator>
+);
+
+const LibraryStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="Library">
+      {props => <ThuVien {...props} />}
+    </Stack.Screen>
+    <Stack.Screen name="ReadBook">
+      {props => <DocSach {...props} />}
     </Stack.Screen>
   </Stack.Navigator>
 );
@@ -88,7 +121,6 @@ const AppNavigator = () => {
       </Tab.Screen>
       <Tab.Screen
         name="Search"
-        component={TimKiem}
         options={{
           tabBarLabel: 'Tìm Kiếm',
           tabBarIcon: ({ color, size }) => (
@@ -96,10 +128,11 @@ const AppNavigator = () => {
           ),
           headerShown: false,
         }}
-      />
+      >
+        {props => <SearchStack {...props} />}
+      </Tab.Screen>
       <Tab.Screen
         name="Library"
-        component={ThuVien}
         options={{
           tabBarLabel: 'Thư Viện',
           tabBarIcon: ({ color, size }) => (
@@ -107,7 +140,9 @@ const AppNavigator = () => {
           ),
           headerShown: false,
         }}
-      />
+      >
+        {props => <LibraryStack {...props} />}
+      </Tab.Screen>
       <Tab.Screen
         name="Setting"
         options={{
