@@ -37,7 +37,7 @@ const ChuyenMuc = ({navigation}) => {
                     numColumns={2} // Hiển thị 2 chuyên mục mỗi hàng
                     showsHorizontalScrollIndicator={false}
                     renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.category} onPress={() => navigation.navigate('CategoryBook')}>
+                        <TouchableOpacity style={styles.category} onPress={() => navigation.navigate('CategoryBook', {id: item.MaChuyenMuc})}>
                             <Image source={{ uri: `${BASE_URL}${item.HinhAnh}` }} style={styles.categoryImage} resizeMode="stretch" />
                             <Text style={styles.categoryTitle}>{item.TenChuyenMuc}</Text>
                         </TouchableOpacity>

@@ -1,32 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, StyleSheet, View, FlatList, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Appbar, Card } from 'react-native-paper';
+import axios from 'axios';
 
+const API_URL = 'http://10.0.2.2:8000/api/';
+const BASE_URL = API_URL.split('/api/')[0];
 const TimKiem = ({ navigation }) => {
-    const categories = [
-        { id: 1, image: 'https://via.placeholder.com/150x150', title: 'Fiction' },
-        { id: 2, image: 'https://via.placeholder.com/150x150', title: 'Science' },
-        { id: 3, image: 'https://via.placeholder.com/150x150', title: 'History' },
-        { id: 4, image: 'https://via.placeholder.com/150x150', title: 'Fiction' },
-        { id: 5, image: 'https://via.placeholder.com/150x150', title: 'Science' },
-        { id: 6, image: 'https://via.placeholder.com/150x150', title: 'History' },
-    ];
-
-    const recentBooks = [
-        { id: 1, image: 'https://via.placeholder.com/150x200', title: 'Book 1' },
-        { id: 2, image: 'https://via.placeholder.com/150x200', title: 'Book 2' },
-        { id: 3, image: 'https://via.placeholder.com/150x200', title: 'Book 3' },
-        { id: 4, image: 'https://via.placeholder.com/150x200', title: 'Book 4' },
-        { id: 5, image: 'https://via.placeholder.com/150x200', title: 'Book 5' },
-        { id: 6, image: 'https://via.placeholder.com/150x200', title: 'Book 6' },
-    ];
-
+    
     const [searchQuery, setSearchQuery] = useState('');
+    const [categories, setCategories] = useState([]);
+    const [books, setBooks] = useState([]);
 
-    const handleSearch = () => {
-        if (searchQuery.trim()) {
-            navigation.navigate('KetQuaTimKiem', { query: searchQuery });
+    const fetchCategories = async (search = "") => {
+        try {
+            const response = await axios.get(`${API_URL}categories?limit=6&search=${search}`);
+            setCategories(response.data);
+        } catch (error) {
+            console.error('Lỗi khi tải chuyên mục:', error);
         }
+    };
+
+    const fetchBooks = async (search = "") => {
+        try {
+            const response = await axios.get(`${API_URL}books?limit=12&search=${search}`);
+            setBooks(response.data);
+        } catch (error) {
+            console.error('Lỗi khi tải sách mới:', error);
+        }
+    };
+
+    const fetchRecommendBook = async () => {
+        try {
+            const response = await axios.get(`${API_URL}recommendBook`);
+            setBooks(response.data);
+        } catch (error) {
+            console.error('Lỗi khi tải sách gợi ý:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchCategories();
+        fetchRecommendBook();
+    }, []);
+
+    const handleSearch = async (search) => {
+        setSearchQuery(search);
+        fetchCategories(search);
+        fetchBooks(search)
     };
 
     return (
@@ -43,45 +63,55 @@ const TimKiem = ({ navigation }) => {
                     style={styles.searchInput}
                     placeholder="Tìm kiếm ..."
                     value={searchQuery}
-                    onChangeText={setSearchQuery}
+                    onChangeText={handleSearch}
                 />
             </View>
 
+            {
+                categories.length >= 1 ?
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Chuyên Mục</Text>
+                        <FlatList
+                            data={categories}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity style={styles.category} onPress={() => navigation.navigate('CategoryBook', {id: item.MaChuyenMuc})}>
+                                    <Image source={{ uri: `${BASE_URL}${item.HinhAnh}` }} style={styles.categoryImage} resizeMode="stretch"/>
+                                    <Text style={styles.categoryTitle}>{item.TenChuyenMuc}</Text>
+                                </TouchableOpacity>
+                            )}
+                            keyExtractor={(item) => item.MaChuyenMuc.toString()}
+                        />
+                    </View>
+                :
+                    null
+            }
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Chuyên Mục</Text>
-                <FlatList
-                    data={categories}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.category} onPress={() => navigation.navigate('CategoryBook')}>
-                            <Image source={{ uri: item.image }} style={styles.categoryImage} />
-                            <Text style={styles.categoryTitle}>{item.title}</Text>
-                        </TouchableOpacity>
-                    )}
-                    keyExtractor={(item) => item.id.toString()}
-                />
-            </View>
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Sách Đề Xuất</Text>
-                <FlatList
-                    data={recentBooks}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={({ item }) => (
-                        <Card style={styles.card} onPress={() => navigation.navigate('ReadBook')}>
-                            <Image
-                                source={{ uri: item.image }}
-                                style={styles.cardImage}
-                                resizeMode="cover"
-                            />
-                            <Card.Content>
-                                <Text style={styles.cardTitle}>{item.title}</Text>
-                            </Card.Content>
-                        </Card>
-                    )}
-                    keyExtractor={(item) => item.id.toString()}
-                />
+                <Text style={styles.sectionTitle}>{ !searchQuery ? "Sách Đề Xuất" : "Sách Tìm Kiếm" }</Text>
+                {
+                    books.length <= 0 ?
+                        <Text style={{ textAlign: 'center' }}>Không tìm thấy sách nào!</Text>
+                    :
+                        <FlatList
+                            data={books}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            renderItem={({ item }) => (
+                                <Card style={styles.card} onPress={() => navigation.navigate('ReadBook', {id: item.MaSach})}>
+                                    <Image
+                                        source={{ uri: `${BASE_URL}${item.HinhAnh}` }}
+                                        style={styles.cardImage}
+                                        resizeMode="stretch"
+                                    />
+                                    <Card.Content>
+                                        <Text style={styles.cardTitle}>{item.TenSach}</Text>
+                                    </Card.Content>
+                                </Card>
+                            )}
+                            keyExtractor={(item) => item.MaSach.toString()}
+                        />
+                }
             </View>
         </ScrollView>
     );
