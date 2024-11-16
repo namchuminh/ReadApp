@@ -1,17 +1,27 @@
-import React from 'react';
-import { ScrollView, Image, StyleSheet, View, Dimensions, FlatList, TouchableOpacity } from 'react-native';
-import { Text, Button, Card, Appbar, IconButton } from 'react-native-paper';
+import React, {useEffect, useState} from 'react';
+import { Image, StyleSheet, View, Dimensions, FlatList, TouchableOpacity } from 'react-native';
+import { Text, Appbar } from 'react-native-paper';
+import axios from 'axios';
+
+const API_URL = 'http://10.0.2.2:8000/api/';
+const BASE_URL = API_URL.split('/api/')[0];
 
 const ChuyenMuc = ({navigation}) => {
+    const [categories, setCategories] = useState([]);
 
-    const categories = [
-        { id: 1, image: 'https://via.placeholder.com/150x150', title: 'Fiction' },
-        { id: 2, image: 'https://via.placeholder.com/150x150', title: 'Science' },
-        { id: 3, image: 'https://via.placeholder.com/150x150', title: 'History' },
-        { id: 4, image: 'https://via.placeholder.com/150x150', title: 'Fiction' },
-        { id: 5, image: 'https://via.placeholder.com/150x150', title: 'Science' },
-        { id: 6, image: 'https://via.placeholder.com/150x150', title: 'History' },
-    ];
+    const fetchCategories = async () => {
+        try {
+            const response = await axios.get(`${API_URL}categories?limit=${1000}`);
+            setCategories(response.data);
+        } catch (error) {
+            console.error('Lỗi khi tải chuyên mục:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
 
     return (
         <View style={styles.container}>
@@ -28,11 +38,11 @@ const ChuyenMuc = ({navigation}) => {
                     showsHorizontalScrollIndicator={false}
                     renderItem={({ item }) => (
                         <TouchableOpacity style={styles.category} onPress={() => navigation.navigate('CategoryBook')}>
-                            <Image source={{ uri: item.image }} style={styles.categoryImage} />
-                            <Text style={styles.categoryTitle}>{item.title}</Text>
+                            <Image source={{ uri: `${BASE_URL}${item.HinhAnh}` }} style={styles.categoryImage} resizeMode="stretch" />
+                            <Text style={styles.categoryTitle}>{item.TenChuyenMuc}</Text>
                         </TouchableOpacity>
                     )}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item.MaChuyenMuc.toString()}
                 />
             </View>
 
