@@ -2,11 +2,12 @@ import React, {useEffect, useState} from 'react';
 import { Image, StyleSheet, View, Dimensions, FlatList, TouchableOpacity } from 'react-native';
 import { Text, Appbar } from 'react-native-paper';
 import axios from 'axios';
-
+import { useIsFocused } from "@react-navigation/native";
 const API_URL = 'http://10.0.2.2:8000/api/';
 const BASE_URL = API_URL.split('/api/')[0];
 
 const ChuyenMuc = ({navigation}) => {
+    const isFocused = useIsFocused();
     const [categories, setCategories] = useState([]);
 
     const fetchCategories = async () => {
@@ -20,7 +21,7 @@ const ChuyenMuc = ({navigation}) => {
 
     useEffect(() => {
         fetchCategories();
-    }, []);
+    }, [isFocused]);
 
 
     return (

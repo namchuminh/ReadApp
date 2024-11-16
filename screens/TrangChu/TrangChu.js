@@ -2,11 +2,13 @@ import React, {useEffect, useState} from 'react';
 import { ScrollView, Image, StyleSheet, View, Dimensions, FlatList, TouchableOpacity } from 'react-native';
 import { Text, Button, Card, Appbar, IconButton } from 'react-native-paper';
 import axios from 'axios';
+import { useIsFocused } from "@react-navigation/native";
 
 const API_URL = 'http://10.0.2.2:8000/api/';
 const BASE_URL = API_URL.split('/api/')[0];
 
 const TrangChu = ({navigation}) => {
+    const isFocused = useIsFocused();
     const [slides, setSlides] = useState([]);
     const [books, setBooks] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -64,7 +66,7 @@ const TrangChu = ({navigation}) => {
         fetchCategories();
         fetchRecommendBook();
         fetchTopRead();
-    }, []);
+    }, [isFocused]);
 
     return (
         <ScrollView style={styles.container}>
@@ -108,7 +110,8 @@ const TrangChu = ({navigation}) => {
                                 resizeMode="stretch"
                             />
                             <Card.Content>
-                                <Text style={styles.cardTitle}>{item.TenSach}</Text>
+                                <Text style={styles.cardTitle}>{item.TenSach.length > 15 ? `${item.TenSach.substring(0, 15)} ...` : item.TenSach}</Text>
+                                <Text style={{ fontSize: 12 }}>{item.TacGia.length > 30 ? `${item.TacGia.substring(0, 30)} ...` : item.TacGia}</Text>
                             </Card.Content>
                         </Card>
                     )}
@@ -149,7 +152,8 @@ const TrangChu = ({navigation}) => {
                                 resizeMode="stretch"
                             />
                             <Card.Content>
-                                <Text style={styles.cardTitle}>{item.TenSach}</Text>
+                                <Text style={styles.cardTitle}>{item.TenSach.length > 20 ? `${item.TenSach.substring(0, 20)} ...` : item.TenSach}</Text>
+                                <Text style={{ fontSize: 12 }}>{item.TacGia.length > 30 ? `${item.TacGia.substring(0, 30)} ...` : item.TacGia}</Text>
                             </Card.Content>
                         </Card>
                     )}
@@ -172,7 +176,8 @@ const TrangChu = ({navigation}) => {
                                 resizeMode="stretch"
                             />
                             <Card.Content>
-                                <Text style={styles.cardTitle}>{item.TenSach}</Text>
+                                <Text style={styles.cardTitle}>{item.TenSach.length > 15 ? `${item.TenSach.substring(0, 15)} ...` : item.TenSach}</Text>
+                                <Text style={{ fontSize: 12 }}>{item.TacGia.length > 30 ? `${item.TacGia.substring(0, 30)} ...` : item.TacGia}</Text>
                             </Card.Content>
                         </Card>
                     )}
@@ -190,7 +195,8 @@ const TrangChu = ({navigation}) => {
                                 resizeMode="stretch"
                             />
                             <Card.Content>
-                                <Text style={styles.cardTitle}>{item.TenSach}</Text>
+                                <Text style={styles.cardTitle}>{item.TenSach.length > 15 ? `${item.TenSach.substring(0, 15)} ...` : item.TenSach}</Text>
+                                <Text style={{ fontSize: 12 }}>{item.TacGia.length > 30 ? `${item.TacGia.substring(0, 30)} ...` : item.TacGia}</Text>
                             </Card.Content>
                         </Card>
                     )}

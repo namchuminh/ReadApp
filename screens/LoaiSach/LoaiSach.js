@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, Image, StyleSheet, View, FlatList, Text } from 'react-native';
 import { Appbar, Card } from 'react-native-paper';
 import axios from 'axios';
-
+import { useIsFocused } from "@react-navigation/native";
 const API_URL = 'http://10.0.2.2:8000/api/';
 const BASE_URL = API_URL.split('/api/')[0];
 
 const LoaiSach = ({ route, navigation }) => {
+    const isFocused = useIsFocused();
     const { id } = route.params;
 
     const [books, setBooks] = useState([]); // Danh sách sách đã tải
@@ -37,7 +38,7 @@ const LoaiSach = ({ route, navigation }) => {
 
     useEffect(() => {
         fetchBooks(); // Tải sách mỗi khi `limit` thay đổi
-    }, [limit]); // Tải sách mới khi `limit` thay đổi
+    }, [isFocused, limit]); // Tải sách mới khi `limit` thay đổi
 
     const handleLoadMore = () => {
         // Kiểm tra nếu còn sách để tải thêm
@@ -78,7 +79,8 @@ const LoaiSach = ({ route, navigation }) => {
                                 resizeMode="stretch"
                             />
                             <Card.Content>
-                                <Text style={styles.cardTitle}>{item.TenSach}</Text>
+                                <Text style={styles.cardTitle}>{item.TenSach.length > 20 ? `${item.TenSach.substring(0, 20)} ...` : item.TenSach}</Text>
+                                <Text style={{ fontSize: 12 }}>{item.TacGia.length > 35 ? `${item.TacGia.substring(0, 35)} ...` : item.TacGia}</Text>
                             </Card.Content>
                         </Card>
                     )}

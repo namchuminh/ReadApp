@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Text, StyleSheet, View, FlatList, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Appbar, Card } from 'react-native-paper';
 import axios from 'axios';
-
+import { useIsFocused } from "@react-navigation/native";
 const API_URL = 'http://10.0.2.2:8000/api/';
 const BASE_URL = API_URL.split('/api/')[0];
 const TimKiem = ({ navigation }) => {
-    
+    const isFocused = useIsFocused();
     const [searchQuery, setSearchQuery] = useState('');
     const [categories, setCategories] = useState([]);
     const [books, setBooks] = useState([]);
@@ -41,7 +41,7 @@ const TimKiem = ({ navigation }) => {
     useEffect(() => {
         fetchCategories();
         fetchRecommendBook();
-    }, []);
+    }, [isFocused]);
 
     const handleSearch = async (search) => {
         setSearchQuery(search);
@@ -105,7 +105,8 @@ const TimKiem = ({ navigation }) => {
                                         resizeMode="stretch"
                                     />
                                     <Card.Content>
-                                        <Text style={styles.cardTitle}>{item.TenSach}</Text>
+                                        <Text style={styles.cardTitle}>{item.TenSach.length > 15 ? `${item.TenSach.substring(0, 15)} ...` : item.TenSach}</Text>
+                                        <Text style={{ fontSize: 12 }}>{item.TacGia.length > 30 ? `${item.TacGia.substring(0, 30)} ...` : item.TacGia}</Text>
                                     </Card.Content>
                                 </Card>
                             )}
