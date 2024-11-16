@@ -186,7 +186,8 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 14,
         marginVertical: 5,
-        marginTop: 15
+        marginTop: 15,
+        fontWeight: 'bold'
     },
     category: {
         alignItems: 'center',
