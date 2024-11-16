@@ -27,6 +27,9 @@ const ProfileStack = () => (
     <Stack.Screen name="Login">
       {props => <DangNhap {...props} />}
     </Stack.Screen>
+    <Stack.Screen name="Register">
+      {props => <DangKy {...props} />}
+    </Stack.Screen>
   </Stack.Navigator>
 );
 

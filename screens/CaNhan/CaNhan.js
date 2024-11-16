@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, Button } from 'react-native';
+import { View, Text, StyleSheet, Image, Button, ScrollView } from 'react-native';
 import { Appbar } from 'react-native-paper';
 
 const CaNhan = ({ navigation }) => {
@@ -8,7 +8,7 @@ const CaNhan = ({ navigation }) => {
         navigation.navigate("Login");
     };
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             {/* Header */}
             <Appbar.Header style={styles.header}>
                 <Appbar.Action icon="home" onPress={() => navigation.navigate('Home')} color="#FFFFFF" />
@@ -57,7 +57,7 @@ const CaNhan = ({ navigation }) => {
             </View>
 
             {/* Buttons for Changing Password and Logging Out */}
-        </View>
+        </ScrollView>
     );
 };
 

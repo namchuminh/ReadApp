@@ -41,17 +41,10 @@ const TimKiem = ({ navigation }) => {
             <View style={styles.searchBox}>
                 <TextInput
                     style={styles.searchInput}
-                    placeholder="Tìm kiếm sách..."
+                    placeholder="Tìm kiếm ..."
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                 />
-            </View>
-
-            {/* Nút tìm kiếm ở giữa */}
-            <View style={styles.buttonContainer}>
-                <Button mode="contained" onPress={handleSearch} style={styles.searchButton}>
-                    Tìm kiếm
-                </Button>
             </View>
 
             <View style={styles.section}>
