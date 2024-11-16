@@ -1,32 +1,70 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { ScrollView, Image, StyleSheet, View, Dimensions, FlatList, TouchableOpacity } from 'react-native';
 import { Text, Button, Card, Appbar, IconButton } from 'react-native-paper';
+import axios from 'axios';
+
+const API_URL = 'http://10.0.2.2:8000/api/';
+const BASE_URL = API_URL.split('/api/')[0];
 
 const TrangChu = ({navigation}) => {
-    // Dữ liệu mẫu
-    const banners = [
-        { id: 1, image: 'https://via.placeholder.com/400x200', title: 'Banner 1' },
-        { id: 2, image: 'https://via.placeholder.com/400x200', title: 'Banner 2' },
-        { id: 3, image: 'https://via.placeholder.com/400x200', title: 'Banner 3' },
-    ];
+    const [slides, setSlides] = useState([]);
+    const [books, setBooks] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [recommendBook, setRecommendBook] = useState([]);
+    const [topRead, setTopRead] = useState([]);
 
-    const recentBooks = [
-        { id: 1, image: 'https://via.placeholder.com/150x200', title: 'Book 1' },
-        { id: 2, image: 'https://via.placeholder.com/150x200', title: 'Book 2' },
-        { id: 3, image: 'https://via.placeholder.com/150x200', title: 'Book 3' },
-        { id: 4, image: 'https://via.placeholder.com/150x200', title: 'Book 4' },
-        { id: 5, image: 'https://via.placeholder.com/150x200', title: 'Book 5' },
-        { id: 6, image: 'https://via.placeholder.com/150x200', title: 'Book 6' },
-    ];
+    const fetchSlides = async () => {
+        try {
+            const response = await axios.get(`${API_URL}slides`);
+            setSlides(response.data); // Đảm bảo response trả về đúng định dạng danh sách
+        } catch (error) {
+            console.error('Lỗi khi tải slides:', error);
+        }
+    };
 
-    const categories = [
-        { id: 1, image: 'https://via.placeholder.com/150x150', title: 'Fiction' },
-        { id: 2, image: 'https://via.placeholder.com/150x150', title: 'Science' },
-        { id: 3, image: 'https://via.placeholder.com/150x150', title: 'History' },
-        { id: 4, image: 'https://via.placeholder.com/150x150', title: 'Fiction' },
-        { id: 5, image: 'https://via.placeholder.com/150x150', title: 'Science' },
-        { id: 6, image: 'https://via.placeholder.com/150x150', title: 'History' },
-    ];
+    const fetchBooks = async () => {
+        try {
+            const response = await axios.get(`${API_URL}books?limit=6`);
+            setBooks(response.data);
+        } catch (error) {
+            console.error('Lỗi khi tải sách mới:', error);
+        }
+    };
+
+    const fetchCategories = async () => {
+        try {
+            const response = await axios.get(`${API_URL}categories?limit=6`);
+            setCategories(response.data);
+        } catch (error) {
+            console.error('Lỗi khi tải chuyên mục:', error);
+        }
+    };
+
+    const fetchRecommendBook = async () => {
+        try {
+            const response = await axios.get(`${API_URL}recommendBook`);
+            setRecommendBook(response.data);
+        } catch (error) {
+            console.error('Lỗi khi tải sách gợi ý:', error);
+        }
+    };
+
+    const fetchTopRead = async () => {
+        try {
+            const response = await axios.get(`${API_URL}topRead`);
+            setTopRead(response.data);
+        } catch (error) {
+            console.error('Lỗi khi tải sách đọc nhiều nhất:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchSlides();
+        fetchBooks();
+        fetchCategories();
+        fetchRecommendBook();
+        fetchTopRead();
+    }, []);
 
     return (
         <ScrollView style={styles.container}>
@@ -43,12 +81,12 @@ const TrangChu = ({navigation}) => {
                     showsHorizontalScrollIndicator={false}
                     pagingEnabled
                 >
-                    {banners.map((banner) => (
-                        <View key={banner.id} style={styles.banner}>
+                    {slides.map((slide) => (
+                        <View key={slide.MaSlide} style={styles.banner}>
                             <Image
-                                source={{ uri: banner.image }}
+                                source={{ uri: `${BASE_URL}${slide.HinhAnh}` }}
                                 style={styles.bannerImage}
-                                resizeMode="cover"
+                                resizeMode="stretch"
                             />
                         </View>
                     ))}
@@ -59,22 +97,22 @@ const TrangChu = ({navigation}) => {
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Sách Mới</Text>
                 <FlatList
-                    data={recentBooks}
+                    data={books}
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     renderItem={({ item }) => (
-                        <Card style={styles.card} onPress={() => navigation.navigate('ReadBook')}>
+                        <Card style={styles.card} onPress={() => navigation.navigate('ReadBook', {id: item.MaSach})}>
                             <Image
-                                source={{ uri: item.image }}
+                                source={{ uri: `${BASE_URL}${item.HinhAnh}` }}
                                 style={styles.cardImage}
-                                resizeMode="cover"
+                                resizeMode="stretch"
                             />
                             <Card.Content>
-                                <Text style={styles.cardTitle}>{item.title}</Text>
+                                <Text style={styles.cardTitle}>{item.TenSach}</Text>
                             </Card.Content>
                         </Card>
                     )}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item.MaSach.toString()}
                 />
             </View>
 
@@ -86,12 +124,12 @@ const TrangChu = ({navigation}) => {
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.category} onPress={() => navigation.navigate('CategoryBook')}>
-                            <Image source={{ uri: item.image }} style={styles.categoryImage} />
-                            <Text style={styles.categoryTitle}>{item.title}</Text>
+                        <TouchableOpacity style={styles.category} onPress={() => navigation.navigate('CategoryBook', {id: item.MaChuyenMuc})}>
+                            <Image source={{ uri: `${BASE_URL}${item.HinhAnh}` }} style={styles.categoryImage} resizeMode="stretch" />
+                            <Text style={styles.categoryTitle}>{item.TenChuyenMuc}</Text>
                         </TouchableOpacity>
                     )}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item.MaChuyenMuc.toString()}
                 />
             </View>
             
@@ -100,22 +138,22 @@ const TrangChu = ({navigation}) => {
             <View style={styles.sectionCategory}>
                 <Text style={styles.sectionTitle}>Sách Cho Bạn</Text>
                 <FlatList
-                    data={recentBooks}
+                    data={recommendBook}
                     numColumns={2} // Hiển thị 2 cuốn sách mỗi hàng
                     showsHorizontalScrollIndicator={false}
                     renderItem={({ item }) => (
-                        <Card style={styles.card} onPress={() => navigation.navigate('ReadBook')}>
+                        <Card style={styles.card} onPress={() => navigation.navigate('ReadBook', {id: item.MaSach})}>
                             <Image
-                                source={{ uri: item.image }}
+                                source={{ uri: `${BASE_URL}${item.HinhAnh}` }}
                                 style={styles.cardImageCategory}
-                                resizeMode="cover"
+                                resizeMode="stretch"
                             />
                             <Card.Content>
-                                <Text style={styles.cardTitle}>{item.title}</Text>
+                                <Text style={styles.cardTitle}>{item.TenSach}</Text>
                             </Card.Content>
                         </Card>
                     )}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item.MaSach.toString()}
                 />
             </View>
 
@@ -123,40 +161,40 @@ const TrangChu = ({navigation}) => {
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Đọc Nhiều Nhất</Text>
                 <FlatList
-                    data={recentBooks}
+                    data={topRead}
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     renderItem={({ item }) => (
-                        <Card style={styles.card} onPress={() => navigation.navigate('ReadBook')}>
+                        <Card style={styles.card} onPress={() => navigation.navigate('ReadBook', {id: item.MaSach})}>
                             <Image
-                                source={{ uri: item.image }}
+                                source={{ uri: `${BASE_URL}${item.HinhAnh}` }}
                                 style={styles.cardImage}
-                                resizeMode="cover"
+                                resizeMode="stretch"
                             />
                             <Card.Content>
-                                <Text style={styles.cardTitle}>{item.title}</Text>
+                                <Text style={styles.cardTitle}>{item.TenSach}</Text>
                             </Card.Content>
                         </Card>
                     )}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item.MaSach.toString()}
                 />
                 <FlatList
-                    data={recentBooks}
+                    data={topRead}
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     renderItem={({ item }) => (
-                        <Card style={styles.card} onPress={() => navigation.navigate('ReadBook')}>
+                        <Card style={styles.card} onPress={() => navigation.navigate('ReadBook', {id: item.MaSach})}>
                             <Image
-                                source={{ uri: item.image }}
+                                source={{ uri: `${BASE_URL}${item.HinhAnh}` }}
                                 style={styles.cardImage}
-                                resizeMode="cover"
+                                resizeMode="stretch"
                             />
                             <Card.Content>
-                                <Text style={styles.cardTitle}>{item.title}</Text>
+                                <Text style={styles.cardTitle}>{item.TenSach}</Text>
                             </Card.Content>
                         </Card>
                     )}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item.MaSach.toString()}
                 />
             </View>
         </ScrollView>
@@ -201,7 +239,7 @@ const styles = StyleSheet.create({
     },
     cardImage: {
         width: 150,
-        height: 200,
+        height: '200',
     },
     sectionCategory: {
         marginTop: 5,
@@ -214,7 +252,8 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 14,
         marginVertical: 5,
-        marginTop: 15
+        marginTop: 15,
+        fontWeight: 'bold'
     },
     readButton: {
         backgroundColor: '#3F51B5',
