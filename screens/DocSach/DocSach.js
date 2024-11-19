@@ -2,30 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Appbar } from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DocSach = ({ navigation }) => {
-  const [pdfUri, setPdfUri] = useState('https://www.pdf995.com/samples/pdf.pdf'); // URL mặc định của PDF
+  const [pdfUri, setPdfUri] = useState('http://10.0.2.2:8000/uploads/book/pdf/1731683046775.pdf'); // URL mặc định của PDF
 
   // Khi component mount, kiểm tra trạng thái đã lưu
   useEffect(() => {
-    const loadSavedPage = async () => {
-      const savedUri = await AsyncStorage.getItem('lastPdfPage');
-      if (savedUri) {
-        setPdfUri(savedUri);
-      }
-    };
-    loadSavedPage();
+
   }, []);
 
-  // Lưu trạng thái PDF mỗi khi URL thay đổi
-  const saveCurrentPage = async (newUri) => {
-    try {
-      await AsyncStorage.setItem('lastPdfPage', newUri);
-    } catch (error) {
-      console.error('Lỗi khi lưu trạng thái PDF:', error);
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -42,11 +27,8 @@ const DocSach = ({ navigation }) => {
 
       {/* WebView hiển thị file PDF */}
       <WebView
-        source={{ uri: pdfUri }}
+        source={{ uri: 'http://10.0.2.2:8000/uploads/book/pdf/1731683046775.pdf' }}
         javaScriptEnabled={true}
-        onNavigationStateChange={(navState) => {
-          saveCurrentPage(navState.url); // Lưu URL trang hiện tại
-        }}
         style={styles.webview}
       />
     </View>

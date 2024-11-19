@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, TextInput, Button, RadioButton } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { LoginContext } from '../../context/LoginContext';
+import axios from "axios";
 
 const DangKy = () => {
   const navigation = useNavigation();
@@ -12,9 +14,66 @@ const DangKy = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleRegister = () => {
-    // Xử lý đăng ký (giả sử thành công)
-    navigation.navigate('Login');
+  const { login } = useContext(LoginContext);
+
+  // Hàm validate tài khoản
+  const validateUsername = (username) => {
+    const regex = /^[a-zA-Z0-9]+$/; // Kiểm tra tài khoản chỉ bao gồm chữ và số, không có dấu cách
+    return regex.test(username);
+  };
+
+  // Hàm validate email
+  const validateEmail = (email) => {
+    const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    return regex.test(email);
+  };
+
+  // Hàm validate số điện thoại
+  const validatePhoneNumber = (phoneNumber) => {
+    const regex = /^(0[3|5|7|8|9])([0-9]{8})$/; // Kiểm tra số điện thoại Việt Nam (10-11 chữ số)
+    return regex.test(phoneNumber);
+  };
+
+  const handleRegister = async () => {
+    if (password !== confirmPassword) {
+      alert("Mật khẩu và xác nhận mật khẩu không khớp!");
+      return;
+    }
+
+    if (!validateUsername(username)) {
+      alert("Tài khoản không hợp lệ!");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      alert("Email không hợp lệ.");
+      return;
+    }
+
+    if (!validatePhoneNumber(phoneNumber)) {
+      alert("Số điện thoại không hợp lệ.");
+      return;
+    }
+
+    try {
+      // Gửi yêu cầu POST đến API
+      const response = await axios.post("http://10.0.2.2:8000/api/register", {
+        HoTen: name,
+        TaiKhoan: username,
+        SoDienThoai: phoneNumber,
+        Email: email,
+        MatKhau: password,
+      });
+
+      login(username, password);
+    } catch (error) {
+      // Xử lý lỗi đăng ký
+      if (error.response) {
+        alert(error.response.data.message);
+      } else {
+        alert("Không thể kết nối đến máy chủ. Vui lòng thử lại.");
+      }
+    }
   };
 
   return (

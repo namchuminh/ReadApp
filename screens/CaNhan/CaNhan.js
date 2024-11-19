@@ -1,11 +1,12 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { View, Text, StyleSheet, Image, Button, ScrollView } from 'react-native';
 import { Appbar } from 'react-native-paper';
+import { LoginContext } from '../../context/LoginContext';
 
 const CaNhan = ({ navigation }) => {
-
+    const { logout } = useContext(LoginContext);
     const handleLogout = () => {
-        navigation.navigate("Login");
+        logout();
     };
     return (
         <ScrollView style={styles.container}>

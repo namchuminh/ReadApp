@@ -1,31 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { LoginContext } from '../../context/LoginContext';
 
 const DangNhap = () => {
   const navigation = useNavigation();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  
+  const { login } = useContext(LoginContext);
+
   const handleLogin = () => {
     // Xử lý đăng nhập (giả sử thành công)
-    navigation.navigate('Home');
+    login(username, password);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Đăng Nhập</Text>
+
       <TextInput
-        label="Email"
-        value={email}
-        onChangeText={text => setEmail(text)}
+        label="Tài khoản"
+        value={username}
+        onChangeText={text => setUsername(text)}
         style={styles.input}
         mode="outlined"
-        keyboardType="email-address"
       />
       <TextInput
-        label="Password"
+        label="Mật khẩu"
         value={password}
         onChangeText={text => setPassword(text)}
         style={styles.input}
@@ -46,13 +47,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
+    padding: 10,
     backgroundColor: '#f5f5f5',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
     textAlign: 'center',
   },
   input: {
