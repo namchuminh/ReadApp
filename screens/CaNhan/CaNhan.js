@@ -19,6 +19,9 @@ const decodeJWT = (token) => {
     return JSON.parse(decoded.toString(CryptoJS.enc.Utf8));
 };
 
+const API_URL = 'http://10.0.2.2:8000/api/';
+const BASE_URL = API_URL.split('/api/')[0];
+
 const CaNhan = ({ navigation }) => {
     const isFocused = useIsFocused();
     const { logout } = useContext(LoginContext);
@@ -34,7 +37,7 @@ const CaNhan = ({ navigation }) => {
         const decodedToken = decodeJWT(token);
         try {
             // Gửi yêu cầu GET đến API
-            const response = await axios.get(`http://10.0.2.2:8000/api/profile/${decodedToken.MaNguoiDung}`);
+            const response = await axios.get(`${API_URL}profile/${decodedToken.MaNguoiDung}`);
     
             setData(response.data)
     
@@ -82,7 +85,7 @@ const CaNhan = ({ navigation }) => {
             {/* Avatar Image */}
             <View style={styles.avatarContainer}>
                 <Image
-                    source={{ uri: '../../assets/avatar-user.jpg' }} // Thay đổi URL hình ảnh avatar ở đây
+                    source={{ uri: 'https://i.pinimg.com/736x/ac/67/4d/ac674d2be5f98abf1c189c75de834155.jpg' }} // Thay đổi URL hình ảnh avatar ở đây
                     style={styles.avatar}
                 />
             </View>
@@ -144,8 +147,8 @@ const styles = StyleSheet.create({
         width: 120,  // Thay đổi kích thước avatar
         height: 120,
         borderRadius: 60,
-        borderWidth: 3,
-        borderColor: '#3F51B5',
+        borderWidth: 2,
+        borderColor: 'white',
     },
     sectionTitle: {
         fontSize: 18,
