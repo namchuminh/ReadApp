@@ -3,6 +3,8 @@ import { Text, StyleSheet, View, FlatList, Image, ScrollView, TouchableOpacity }
 import { TextInput, Button, Appbar, Card } from 'react-native-paper';
 import axios from 'axios';
 import { useIsFocused } from "@react-navigation/native";
+import Spinner from 'react-native-loading-spinner-overlay';
+
 const API_URL = 'http://10.0.2.2:8000/api/';
 const BASE_URL = API_URL.split('/api/')[0];
 const TimKiem = ({ navigation }) => {
@@ -10,6 +12,7 @@ const TimKiem = ({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [categories, setCategories] = useState([]);
     const [books, setBooks] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const fetchCategories = async (search = "") => {
         try {
@@ -38,9 +41,23 @@ const TimKiem = ({ navigation }) => {
         }
     };
 
+    const fetchAllData = async () => {
+        setIsLoading(true); // Bật trạng thái loading
+        try {
+            await Promise.all([
+                fetchCategories(),
+                fetchRecommendBook()
+            ]);
+        } catch (error) {
+            console.error('Lỗi khi tải dữ liệu:', error);
+        } finally {
+            setIsLoading(false); // Tắt trạng thái loading
+        }
+    };
+
+
     useEffect(() => {
-        fetchCategories();
-        fetchRecommendBook();
+        fetchAllData();
     }, [isFocused]);
 
     const handleSearch = async (search) => {
@@ -51,6 +68,11 @@ const TimKiem = ({ navigation }) => {
 
     return (
         <ScrollView style={styles.container}>
+            <Spinner
+                visible={isLoading} // Hiển thị spinner khi isLoading === true
+                style={{ flex: 1, color: '#f2f2f2'}}
+            />
+
             <Appbar.Header style={styles.header}>
                 <Appbar.Action icon="home" onPress={() => navigation.navigate('Home')} color="#FFFFFF" />
                 <Appbar.Content title="Tìm Kiếm" titleStyle={styles.headerTitle} />
@@ -90,7 +112,7 @@ const TimKiem = ({ navigation }) => {
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>{ !searchQuery ? "Sách Đề Xuất" : "Sách Tìm Kiếm" }</Text>
                 {
-                    books.length <= 0 ?
+                    books.length <= 0 && !isLoading ?
                         <Text style={{ textAlign: 'center' }}>Không tìm thấy sách nào!</Text>
                     :
                         <FlatList

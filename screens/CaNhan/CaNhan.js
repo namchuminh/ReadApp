@@ -6,6 +6,7 @@ import CryptoJS from 'crypto-js';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useIsFocused } from "@react-navigation/native";
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const decodeJWT = (token) => {
     const parts = token.split('.');
@@ -22,6 +23,7 @@ const CaNhan = ({ navigation }) => {
     const isFocused = useIsFocused();
     const { logout } = useContext(LoginContext);
     const [data, setData] = useState({})
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleLogout = () => {
         logout();
@@ -45,12 +47,31 @@ const CaNhan = ({ navigation }) => {
         }
     }
 
+    const fetchAllData = async () => {
+        setIsLoading(true); // Bật trạng thái loading
+        try {
+            await Promise.all([
+                fetchData(),
+            ]);
+        } catch (error) {
+            console.error('Lỗi khi tải dữ liệu:', error);
+        } finally {
+            setIsLoading(false); // Tắt trạng thái loading
+        }
+    };
+
+
     useEffect(() => {
-        fetchData();
-    }, [isFocused])
+        fetchAllData();
+    }, [isFocused]);
 
     return (
         <ScrollView style={styles.container}>
+            <Spinner
+                visible={isLoading} // Hiển thị spinner khi isLoading === true
+                style={{ flex: 1, color: '#f2f2f2'}}
+            />
+
             {/* Header */}
             <Appbar.Header style={styles.header}>
                 <Appbar.Action icon="home" onPress={() => navigation.navigate('Home')} color="#FFFFFF" />

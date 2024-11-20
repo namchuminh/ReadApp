@@ -3,12 +3,15 @@ import { Image, StyleSheet, View, Dimensions, FlatList, TouchableOpacity } from 
 import { Text, Appbar } from 'react-native-paper';
 import axios from 'axios';
 import { useIsFocused } from "@react-navigation/native";
+import Spinner from 'react-native-loading-spinner-overlay';
+
 const API_URL = 'http://10.0.2.2:8000/api/';
 const BASE_URL = API_URL.split('/api/')[0];
 
 const ChuyenMuc = ({navigation}) => {
     const isFocused = useIsFocused();
     const [categories, setCategories] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const fetchCategories = async () => {
         try {
@@ -19,13 +22,31 @@ const ChuyenMuc = ({navigation}) => {
         }
     };
 
-    useEffect(() => {
-        fetchCategories();
-    }, [isFocused]);
+    const fetchAllData = async () => {
+        setIsLoading(true); // Bật trạng thái loading
+        try {
+            await Promise.all([
+                fetchCategories(),
+            ]);
+        } catch (error) {
+            console.error('Lỗi khi tải dữ liệu:', error);
+        } finally {
+            setIsLoading(false); // Tắt trạng thái loading
+        }
+    };
 
+
+    useEffect(() => {
+        fetchAllData();
+    }, [isFocused]);
 
     return (
         <View style={styles.container}>
+            <Spinner
+                visible={isLoading} // Hiển thị spinner khi isLoading === true
+                style={{ flex: 1, color: '#f2f2f2'}}
+            />
+
             <Appbar.Header style={styles.header}>
                 <Appbar.Action icon="home" onPress={() => navigation.navigate('Home')} color="#FFFFFF" />
                 <Appbar.Content title="Chuyên Mục" titleStyle={styles.headerTitle} />
