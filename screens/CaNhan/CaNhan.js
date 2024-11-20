@@ -1,26 +1,67 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import { View, Text, StyleSheet, Image, Button, ScrollView } from 'react-native';
 import { Appbar } from 'react-native-paper';
 import { LoginContext } from '../../context/LoginContext';
+import CryptoJS from 'crypto-js';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { useIsFocused } from "@react-navigation/native";
+
+const decodeJWT = (token) => {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+        throw new Error('JWT không hợp lệ');
+    }
+    
+    const payload = parts[1];
+    const decoded = CryptoJS.enc.Base64.parse(payload);
+    return JSON.parse(decoded.toString(CryptoJS.enc.Utf8));
+};
 
 const CaNhan = ({ navigation }) => {
+    const isFocused = useIsFocused();
     const { logout } = useContext(LoginContext);
+    const [data, setData] = useState({})
+
     const handleLogout = () => {
         logout();
     };
+
+    const fetchData = async () => {
+        const token = await AsyncStorage.getItem('token');
+        const decodedToken = decodeJWT(token);
+        try {
+            // Gửi yêu cầu GET đến API
+            const response = await axios.get(`http://10.0.2.2:8000/api/profile/${decodedToken.MaNguoiDung}`);
+    
+            setData(response.data)
+    
+        } catch (error) {
+            if (error.response) {
+                alert(error.response.data.message);
+            } else {
+                alert("Không thể kết nối đến máy chủ. Vui lòng thử lại.");
+            }
+        }
+    }
+
+    useEffect(() => {
+        fetchData();
+    }, [isFocused])
+
     return (
         <ScrollView style={styles.container}>
             {/* Header */}
             <Appbar.Header style={styles.header}>
                 <Appbar.Action icon="home" onPress={() => navigation.navigate('Home')} color="#FFFFFF" />
-                <Appbar.Content title="Nguyễn Văn An" titleStyle={styles.headerTitle} />
+                <Appbar.Content title="Cá Nhân" titleStyle={styles.headerTitle} />
                 <Appbar.Action icon="square-edit-outline" onPress={() => navigation.navigate('Home')} color="#FFFFFF" />
             </Appbar.Header>
 
             {/* Avatar Image */}
             <View style={styles.avatarContainer}>
                 <Image
-                    source={{ uri: 'https://via.placeholder.com/150' }} // Thay đổi URL hình ảnh avatar ở đây
+                    source={{ uri: '../../assets/avatar-user.jpg' }} // Thay đổi URL hình ảnh avatar ở đây
                     style={styles.avatar}
                 />
             </View>
@@ -30,25 +71,25 @@ const CaNhan = ({ navigation }) => {
             <View style={styles.infoContainer}>
                 <View style={styles.row}>
                     <Text style={styles.label}>Họ Tên:</Text>
-                    <Text style={styles.infoText}>Nguyễn Văn A</Text>
+                    <Text style={styles.infoText}>{data.HoTen}</Text>
                 </View>
                 <View style={styles.separator}></View>
 
                 <View style={styles.row}>
                     <Text style={styles.label}>Tài Khoản:</Text>
-                    <Text style={styles.infoText}>nguyenvana</Text>
+                    <Text style={styles.infoText}>{data.TaiKhoan}</Text>
                 </View>
                 <View style={styles.separator}></View>
 
                 <View style={styles.row}>
                     <Text style={styles.label}>Số Điện Thoại:</Text>
-                    <Text style={styles.infoText}>0123456789</Text>
+                    <Text style={styles.infoText}>{data.SoDienThoai}</Text>
                 </View>
                 <View style={styles.separator}></View>
 
                 <View style={styles.row}>
                     <Text style={styles.label}>Email:</Text>
-                    <Text style={styles.infoText}>nguyenvana@example.com</Text>
+                    <Text style={styles.infoText}>{data.Email}</Text>
                 </View>
                 <View style={styles.separator}></View>
 

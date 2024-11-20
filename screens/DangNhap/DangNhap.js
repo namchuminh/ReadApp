@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { LoginContext } from '../../context/LoginContext';
@@ -16,8 +16,10 @@ const DangNhap = () => {
   };
 
   return (
-    <View style={styles.container}>
-
+    <ImageBackground
+      source={require('../../assets/bg-login.jpg')}  // Sửa lại ở đây
+      style={styles.container}>
+      <Text style={styles.title}>ĐĂNG NHẬP</Text>
       <TextInput
         label="Tài khoản"
         value={username}
@@ -39,7 +41,7 @@ const DangNhap = () => {
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={styles.link}>Chưa có tài khoản? Đăng ký</Text>
       </TouchableOpacity>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -47,13 +49,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 10,
-    backgroundColor: '#f5f5f5',
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingBottom: 50,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+    marginBottom: 15,
     textAlign: 'center',
+    color: '#3F51B5'
   },
   input: {
     marginBottom: 15,
@@ -64,7 +69,7 @@ const styles = StyleSheet.create({
   link: {
     textAlign: 'center',
     color: '#6200EE',
-    marginTop: 10,
+    marginTop: 15,
   },
 });
 

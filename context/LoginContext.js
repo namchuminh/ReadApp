@@ -34,7 +34,10 @@ export const LoginProvider = ({ children }) => {
         }
     };
 
-    const logout = () => setIsLoggedIn(false);
+    const logout = async () => {
+        await AsyncStorage.removeItem("token");
+        setIsLoggedIn(false);
+    };
 
     return (
         <LoginContext.Provider value={{ isLoggedIn, login, logout }}>

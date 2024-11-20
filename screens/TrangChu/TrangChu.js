@@ -3,6 +3,7 @@ import { ScrollView, Image, StyleSheet, View, Dimensions, FlatList, TouchableOpa
 import { Text, Button, Card, Appbar, IconButton } from 'react-native-paper';
 import axios from 'axios';
 import { useIsFocused } from "@react-navigation/native";
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const API_URL = 'http://10.0.2.2:8000/api/';
 const BASE_URL = API_URL.split('/api/')[0];
@@ -14,6 +15,7 @@ const TrangChu = ({navigation}) => {
     const [categories, setCategories] = useState([]);
     const [recommendBook, setRecommendBook] = useState([]);
     const [topRead, setTopRead] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const fetchSlides = async () => {
         try {
@@ -60,16 +62,35 @@ const TrangChu = ({navigation}) => {
         }
     };
 
+    const fetchAllData = async () => {
+        setIsLoading(true); // Bật trạng thái loading
+        try {
+            await Promise.all([
+                fetchSlides(),
+                fetchBooks(),
+                fetchCategories(),
+                fetchRecommendBook(),
+                fetchTopRead(),
+            ]);
+        } catch (error) {
+            console.error('Lỗi khi tải dữ liệu:', error);
+        } finally {
+            setIsLoading(false); // Tắt trạng thái loading
+        }
+    };
+
+
     useEffect(() => {
-        fetchSlides();
-        fetchBooks();
-        fetchCategories();
-        fetchRecommendBook();
-        fetchTopRead();
+        fetchAllData();
     }, [isFocused]);
 
     return (
         <ScrollView style={styles.container}>
+            <Spinner
+                visible={isLoading} // Hiển thị spinner khi isLoading === true
+                style={{ flex: 1, color: '#f2f2f2'}}
+            />
+
             <Appbar.Header style={styles.header}>
                 <Appbar.Action icon="home" onPress={() => navigation.navigate('Home')} color="#FFFFFF" />
                 <Appbar.Content title="Trang Chủ" titleStyle={styles.headerTitle} />
